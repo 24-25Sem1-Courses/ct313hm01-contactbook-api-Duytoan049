@@ -2,6 +2,8 @@ const express = require("express");
 const contactsController = require("../controllers/contacts.controller");
 const { methodNotAllowed } = require("../controllers/error.controller");
 
+const avatarUpload = require("../middlewares/avatar-upload.middleware")
+
 const router = express.Router();
 
 module.exports.setup = (app) => {
@@ -24,6 +26,8 @@ module.exports.setup = (app) => {
  *         schema:
  *           type: string
  *         description: Filter by contact name
+ *       - $ref: '#/components/parameters/limitParam'
+ *       - $ref: '#/components/parameters/pageParam'
  *     tags:
  *       - contacts
  *     responses:
@@ -45,6 +49,8 @@ module.exports.setup = (app) => {
  *                       type: array
  *                       items:
  *                         $ref: '#/components/schemas/Contact'
+ *                     metadata:
+ *                       $ref: '#/components/schemas/PageinationMetadata' 
  */
 /**
  * @swagger
@@ -173,11 +179,11 @@ module.exports.setup = (app) => {
  *         $ref: '#/components/responses/200NoData'  
  */
 router.get("/", contactsController.getContactsByFilter);
-router.post("/", contactsController.createContact);
+router.post("/", avatarUpload, contactsController.createContact);
 router.delete("/", contactsController.deleteAllContacts);
 router.all("/", methodNotAllowed);
 router.get("/:id", contactsController.getContact);
-router.put("/:id", contactsController.updateContact);
+router.put("/:id", avatarUpload, contactsController.updateContact);
 router.delete("/:id", contactsController.deleteContact);
 router.all("/:id", methodNotAllowed);
 };
